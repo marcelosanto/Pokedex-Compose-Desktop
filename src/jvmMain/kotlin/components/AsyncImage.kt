@@ -12,6 +12,7 @@ import androidx.compose.ui.res.loadImageBitmap
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.cache.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -53,6 +54,8 @@ fun <T> AsyncImage(
 suspend fun loadImageBitmap(url: String): ImageBitmap =
     urlStream(url).use(::loadImageBitmap)
 
-private suspend fun urlStream(url: String) = HttpClient(CIO).use {
+private suspend fun urlStream(url: String) = HttpClient(CIO) {
+    install(HttpCache)
+}.use {
     ByteArrayInputStream(it.get(url).body())
 }
