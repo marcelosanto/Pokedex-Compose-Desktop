@@ -1,4 +1,4 @@
-package model
+package network.model
 
 data class Api(
     val count: Long,
@@ -7,7 +7,7 @@ data class Api(
     val results: List<Pokemon>
 )
 
-data class Pokemon (
+data class Pokemon(
     val name: String,
     val url: String
 )

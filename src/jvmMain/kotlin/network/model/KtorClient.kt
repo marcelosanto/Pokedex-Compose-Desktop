@@ -1,3 +1,5 @@
+package network.model
+
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -8,13 +10,13 @@ import io.ktor.serialization.gson.*
 
 object KtorClient {
     val client = HttpClient(CIO) {
-        install(HttpTimeout){
+        install(HttpTimeout) {
             socketTimeoutMillis = 3000
             requestTimeoutMillis = 3000
             connectTimeoutMillis = 3000
         }
 
-        install(ContentNegotiation){
+        install(ContentNegotiation) {
             gson()
         }
 
