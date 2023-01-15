@@ -21,19 +21,19 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import components.AsyncImage
 import components.loadImageBitmap
-import kotlinx.coroutines.runBlocking
 import network.model.Pokemon
+import network.model.data.PokemonDetail
 import utils.Const.urlImage
 
 @Composable
 @Preview
 fun App() {
 
-    val pokemonList = runBlocking {
-        GetPokemonList().getPokemons().results
-    }
+    val mainViewModel = MainViewModel()
 
-    val pokeInfo = remember { mutableStateListOf<Pokemon>() }
+    val pokemonList = mainViewModel.pokemons
+
+    val pokeInfo = remember { mutableStateListOf<PokemonDetail>() }
 
     MaterialTheme {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -42,34 +42,13 @@ fun App() {
                 Row(modifier = Modifier.background(Color.Red)) {
                     PokemonList(pokemonList) {
                         pokeInfo.clear()
-                        pokeInfo.add(it)
-                        println(it)
+                        pokeInfo.add(mainViewModel.getPokemon(it.url))
                     }
                 }
                 Row(modifier = Modifier.background(Color.Blue).fillMaxSize()) {
                     LazyColumn {
                         items(pokeInfo) {
-                            Row(modifier = Modifier.background(Color.Blue).fillMaxWidth()) {
-                                AsyncImage(
-                                    key = urlImage(
-                                        it.url.dropLast(1).takeLastWhile { it.isDigit() }.toInt().toString()
-                                    ),
-                                    load = {
-                                        loadImageBitmap(
-                                            urlImage(
-                                                it.url.dropLast(1).takeLastWhile { it.isDigit() }.toInt().toString()
-                                            )
-                                        )
-                                    },
-                                    painterFor = { BitmapPainter(it) },
-                                    contentDescription = "",
-                                    modifier = Modifier.size(200.dp)
-                                )
-                                Column {
-                                    Text(it.name)
-                                    Text("#${it.url.dropLast(1).takeLastWhile { it.isDigit() }.toInt().toString()}")
-                                }
-                            }
+                            PokemonInfoDetail(it)
                         }
                     }
                 }
@@ -94,11 +73,11 @@ private fun PokemonList(pokemonList: List<Pokemon>, onClick: (Pokemon) -> Unit) 
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AsyncImage(
-                        key = urlImage(it.url.dropLast(1).takeLastWhile { it.isDigit() }.toInt().toString()),
+                        key = urlImage(it.url.toInt()),
                         load = {
                             loadImageBitmap(
                                 urlImage(
-                                    it.url.dropLast(1).takeLastWhile { it.isDigit() }.toInt().toString()
+                                    it.url.toInt()
                                 )
                             )
                         },
@@ -108,13 +87,51 @@ private fun PokemonList(pokemonList: List<Pokemon>, onClick: (Pokemon) -> Unit) 
                     )
                     Text(it.name, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                     Text(
-                        it.url.dropLast(1).takeLastWhile { it.isDigit() }.toInt().toString(),
+                        it.url,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                 }
 
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PokemonInfoDetail(pokemon: PokemonDetail) {
+    Card(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Column {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                AsyncImage(
+                    key = urlImage(pokemon.id),
+                    load = {
+                        loadImageBitmap(
+                            urlImage(
+                                pokemon.id
+                            )
+                        )
+                    },
+                    painterFor = { BitmapPainter(it) },
+                    contentDescription = "",
+                    modifier = Modifier.size(200.dp)
+                )
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Text("#${pokemon.id}", fontSize = 20.sp, color = Color.Gray)
+                    Text(pokemon.name, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+                    Card(backgroundColor = Color.Blue.copy(0.7f)) {
+                        Text(
+                            "WATER",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(5.dp)
+                        )
+                    }
+
+                }
+            }
+            Text("Spits fire that is hot enough to melt boulders. uKnown to cause forest fires nunintentionally.")
         }
     }
 }

@@ -14,11 +14,11 @@ import java.nio.file.Paths
 
 object KtorClient {
     val client = HttpClient(CIO) {
-        install(HttpTimeout) {
-            socketTimeoutMillis = 3000
-            requestTimeoutMillis = 3000
-            connectTimeoutMillis = 3000
-        }
+//        install(HttpTimeout) {
+//            socketTimeoutMillis = 3000
+//            requestTimeoutMillis = 3000
+//            connectTimeoutMillis = 3000
+//        }
 
         install(HttpCache) {
             val cacheFile = Files.createDirectories(Paths.get("build/cache")).toFile()
